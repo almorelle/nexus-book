@@ -6596,20 +6596,31 @@ You can find more information about this Mojo https://repository.sonatype.org/co
 ----
 
 [[rhc]]
-== Repository Health Check
+== Health Check
+
+http://sonatype.com/Products/Sonatype-Insight[Sonatype Insight] is
+ available as a service that provides license and security information
+ about artifacts. Sonatype Insight itself consists of tools to monitor
+ and manage license, quality and security data about artifacts used in
+ your software development life cycle.
+
+The Sonatype Insight Service is part of the Central Repository and
+exposes data about the artifacts there, including license information,
+security vulnerability data and other statistics like usage data and
+download numbers.
+
+It can be integrated in tools like Nexus and continuous integration
+servers to provide further information about artifacts.
+
+=== Repository Health Check
 
 Repository Health Check is a feature of Nexus that integrates data
 used for http://sonatype.com/Products/Sonatype-Insight[Sonatype
-Insight]. Sonatype Insight is a separate product that consists of
-tools to monitor and manage license, quality and security data about
-artifacts used in your software development life cycle. 
+Insight]. 
 
 Repository Health Check provides access to a limited subset of the
 available data in Sonatype Insight via the Sonatype Insight Service
-right in your Nexus server. The Sonatype Insight Service is part of
-the Central Repository and exposes data about the artifacts there,
-including license information, security vulnerability data and other
-statistics like usage data and download numbers.
+right in your Nexus server.
 
 To perform a Repository Health Check about the artifacts in your Nexus
 instance, you have to click the Analyze button in the Quality column
@@ -6698,7 +6709,7 @@ found in the repository matching it to data available from the
 Sonatype Insight Service.
 
 The same data can be used in a dynamic fashion for continuous
-integration (CI) systems with the Insight for CI system. It allows you
+integration (CI) servers with the Insight for CI system. It allows you
 to run health check analysis as part of a CI server build and is
 available as plugin for various servers providing security and license
 analysis of the artifacts produced by the configured build.
@@ -6718,16 +6729,16 @@ rar, mar and nbm.
 Currently Insight for CI is available as a plugin for the Jenkins and
 Hudson CI servers.
 
-====  Installation and Setup of Insight for CI
+====  Installation and Setup of Insight for CI on Hudson/Jenkins
 
 Insight for CI is available as .hpi file for download from
-Sonatype. To install the plugin in Hudson and Jenkins you log in as
+Sonatype. To install the plugin in Hudson or Jenkins you log in as
 user with administrative rights and select Manage Hudson/Manage
 Jenkins in the left hand navigation. The management menu will allow you
 to access the Manage Plugins section. Within the Plugin Manager you
 can install the plugin by uploading the .hpi file in the Advanced tab.
 
-After a successful upload and restart of Hudson or Jenkins the plugin
+After a successful upload and restart of the server the plugin
 will show as an enabled plugin in the Installed tab of the Plugin
 Manager with the name Insight CI Plugin (Hudson/Jenkins).
 
@@ -6740,15 +6751,18 @@ displayed in <<fig-insightfci-manage-hudson-menu>>
 
 [[fig-insightfci-manage-hudson-menu]]
 .The Manage Hudson menu with the Sonatype Insight item
-image::figs/web/insightfci-manage-hudson-menu.png[scale=60]
+image::figs/web/insightfci-manage-hudson-menu.png[scale=50]
 
 The Sonatype Insight global configuration is displayed in
 <<fig-insightfci-global-configuration>> and shows options for Insight
-server settings, global mask options and global path options. The
-Server configuration sets the URL at which the Insight service is
-available. The Global mask options contains the configuration for
+server settings, global mask options and global path options. 
+
+The Server configuration sets the URL at which the Sonatype Insight
+Service is available.
+
+The Global mask options contain the configuration for
 sending CI details and for anonymizing paths. If Send CI details is
-activated additional details about the CI server such as build name
+activated, additional details about the CI server such as build name
 and environment will be submitted with each Insight report generation
 request. If Anonymize paths is activated all file and resource path
 information submitted to the Insight server will be anonymized prior
@@ -6758,8 +6772,8 @@ to sending.
 .The global Sonatype Insight configuration
 image::figs/web/insightfci-global-configuration.png[scale=60]
 
-The global path options contains parameter value templates that can be
-overridden in the build job specific configuration for the same
+The global path options contain parameter value default values that
+can be overridden in the build job specific configuration for the same
 parameters.
 
 The Proprietary packages configuration allows you to configure a comma
@@ -6768,38 +6782,40 @@ the Insight analysis.
 
 The Include folders and Include files configurations allow you to
 provide a comma separated list of folder and file naming patterns to
-include in the Insight scanning process.
+include in the scanning process looking for archives to analyze.
 
 Respectively the Exclude folders and Exclude files configurations
 allows you to configure directory and file name patterns that should
 be ignored.
 
-==== Configuring Insight for CI for a Build Job
+==== Configuring Insight for CI for a Build Job on Hudson/Jenkins
 
 With the Insight for CI Plugin successfully installed, it can be
 activated for individual build jobs by activating the Post-build
 Action called Insight Post-build Scan on the the configuration screen
 for an individual build job as visible in
 <<fig-insightfci-post-build-scan-config>> . In addition to the
-activation, an Application ID token has to be provided. It is
-required and links the job with an application id on the Insight Server.
+activation, an Application ID token has to be provided. It is required
+and links the job with an application identifier on the Insight
+Server. The Validate button can be used to confirm the
+Application ID. An unsuccessful validation results in an Unknown Token
+error message.
 
 [[fig-insightfci-post-build-scan-config]]
 .Post-build scan configuration including Advanced options
-image::figs/web/insightfci-post-build-scan-config.png[scale=60]
+image::figs/web/insightfci-post-build-scan-config.png[scale=70]
 
 In Advanced options the optional configurations for propriertary
 packages and includes and excludes for files and folders can be
 provided and will override any defaults set in the global
-configuration for the Sonatype Insight plugin.
+configuration for the Sonatype Insight plugin. After each build
+execution the plugin will scan the workspace for artifacts using these
+options. It will include the found artifacts in the data gathering for
+submitting data to the Insight server for analysis in a synchronous
+execution. Depending on the volume of data submitted and analyzed the
+process can take up to a few minutes.
 
-Once configured for a build each execution will scan the workspace
-after the build for artifacts to include in the data submitted to the
-Insight server for analysis in a synchronous execution. Depending on
-the volume of data submitted and analyzed the process can take up to a
-few minutes.
-
-==== Viewing Results of an Insight for CI Execution
+==== Viewing Results of an Insight for CI Execution on Hudson/Jenkins
 
 After successful configuration and execution of a build and the
 configured post-build scan a result overview of the latest build and
@@ -6807,12 +6823,13 @@ scan is available in the Quality column of the job list as visible in
 <<fig-insightfci-job-list-with-quality-column>>.
 
 [[fig-insightfci-job-list-with-quality-column]]
-.Job list with Insight for CI scan result overview visible in the quality column
-image::figs/web/insightfci-job-list-with-quality-column.png[scale=60] 
+.Job list with Insight for CI scan result overview visible in the Quality column
+image::figs/web/insightfci-job-list-with-quality-column.png[scale=50] 
 
-The overview data in the column displays the number of security and
-license issued found. Clicking on the overview data will bring up the
-Summary view of the Insight Report for the latest build.
+The overview data in the column displays the number of security issues
+found on the left and license issues found on the right. Clicking on
+the overview data will bring up the Summary view of the Insight Report
+for the latest build.
 
 The Summary view displays an overview with counts for artifacts
 overall as well as for license and security issues found as visible in
@@ -6820,32 +6837,31 @@ overall as well as for license and security issues found as visible in
 
 [[fig-insightfci-summary]]
 .Summary panel of the Insight Scan
-image::figs/web/insightfci-summary.png[scale=50] 
+image::figs/web/insightfci-summary.png[scale=40] 
 
 The header of the Insight Scan view shows the date of the report
-generation as well as the by whom it was created and requested. There
+generation as well as by whom it was created and requested. There
 are four tabs available for further information with the Summary tab
 displaying as the default.
 
-The Scope Analysis section of the Summary tab contains the number of
-artifacts identfied as open source compared to the total number of
+The Scope of Analysis section of the Summary tab contains the number
+of artifacts identfied as open source compared to the total number of
 artifacts analyzed as well as the number of security and license
 alerts.
 
 The Security Issues sections displays the number of vulnerabilities
 found as well their severity using a threat level scale ranging from
 one to ten. Two different visualisations and a dependency depth chart
-to hightlight the distribution of the offending artifacts in the
-application dependencies graph are used.
-
+are used to hightlight the distribution of the offending artifacts in the
+application dependencies graph.
 
 The License Analysis section displays visualisations for the
-distribution of licenses cetegorizing the licences into Copyleft, Non
+distribution of licences cetegorizing the licences into Copyleft, Non
 Standard, Not Provided, Weak Copyleft and Liberal as well as a
 dependency depth chart.
 
-The security Issues view visible in <<fig-insightfci-security-issues>>
-contains list of all the found issues in a table with sortable columns
+The Security Issues view visible in <<fig-insightfci-security-issues>>
+contains a list of all the issues fund in a table with sortable columns
 and filter input fields for each column. The Group, Artifact and
 Version column allow you to identify the affected artifacts. The
 threat level column contains the numeric value found as a quantity for
@@ -6855,33 +6871,44 @@ contain further links and information about the security threat.
 
 [[fig-insightfci-security-issues]]
 .Security Issues panel of the Insight Scan
-image::figs/web/insightfci-summary.png[scale=50] 
+image::figs/web/insightfci-security-issues.png[scale=40] 
 
-The license analysis view shows a detailed list of all the license
+The License Analysis view shows a detailed list of all the license
 data found for the identified artifacts. The table has columns
 containing License Threat, Declared License, Observed License in
 Source as analysis data as well as Group, Artifact and Version as
-identifiers for the artifact in a specific row. Each row also has a
-checkbox to allow you to configure, that this specific issue should be
-ignored for future builds.  TODO confirm and maybe detail
+identifiers for the artifact in a specific row. 
 
 [[fig-insightfci-license-analysis]]
-.todo
-image::figs/web/insightfci-license-analysis.png[scale=50] 
+.License Analysis panel of the Insight Scan
+image::figs/web/insightfci-license-analysis.png[scale=40] 
 
 The Unmatched Artifacts tab displays a table of artifacts for which no
-Insight data could be found in the analysis. They are identified by
-Filename, Path and Checksum (TODO ?? not sure.. cant read in
-screencast) values in the respective columns.
+Insight data could be found in the analysis as displayed in
+<<fig-insightfci-unmatched-artifacts-unknown>>, when the Unknown
+selector on the top of the table was pressed.
 
-[[fig-insightfci-unmatched-artifacts]]
-.todo
-image::figs/web/insightfci-unmatched-artifacts.png[scale=50] 
+[[fig-insightfci-unmatched-artifacts-unknown]]
+.Unmatched Artifacts of Unknown charateristics
+image::figs/web/insightfci-unmatched-artifacts-unknown.png[scale=40] 
 
-TODO configure build to fail for severity of security or license
-problem and more.. need to see in actual plugin because what I got in
-the sample setup does not do that yet (still need to run a build)
+They are identified by Filename, Path and Hash values in the
+respective columns and each column header can be used for sorting and
+filtering the table contents.
 
+Selecting Partial Match in the View By selector on top of the
+Unmatched Artifacts tab will display a view as displayed in 
+<<fig-insightfci-unmatched-artifacts-partial-match>>.  
+
+[[fig-insightfci-unmatched-artifacts-partial-match]]
+.Unmatched Artifacts for which a Partial Match has been detected
+image::figs/web/insightfci-unmatched-artifacts-partial-match.png[scale=40] 
+
+The upper table displays columns for License Threat, Security Threat,
+File Name and the number of Matches.  Selecting a record in this table
+populates the table below with multiple rows details License,
+Security, Group, Artifact, Version and Score for all the matches found
+for the record in the upper table.
 
 [[settings]]
 == Managing Maven Settings
